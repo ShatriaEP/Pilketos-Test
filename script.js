@@ -1,37 +1,58 @@
-let votingTerkunci = localStorage.getItem("votingTerkunci") === "true";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAT0CmCyoACw3X5haMTz5IMQNfa8v8sZ9Y",
+  authDomain: "pilketos-test.firebaseapp.com",
+  projectId: "pilketos-test",
+  storageBucket: "pilketos-test.appspot.com",
+  messagingSenderId: "189300135890",
+  appId: "1:189300135890:web:e8adbe7abc02d1a96a1a0b",
+  measurementId: "G-NSX7YQ0GML",
+  databaseURL: "https://pilketos-test-default-rtdb.firebaseio.com"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 let sudahVote = localStorage.getItem("sudahVote") === "true";
 let hasilTerlihat = false;
+let votingTerkunci = false;
+let chartInstance = null;
 
-function updateStatus() {
-  document.getElementById("toggleVotingBtn").textContent = votingTerkunci ? "Buka Voting" : "Kunci Voting";
-  document.getElementById("toggleHasilBtn").textContent = hasilTerlihat ? "Tutup Hasil Voting" : "Lihat Hasil Voting";
-}
+const hasilRef = ref(db, "hasil");
+const statusRef = ref(db, "votingTerkunci");
+
+// Dengar status voting realtime
+onValue(statusRef, (snapshot) => {
+  votingTerkunci = snapshot.val() || false;
+  updateStatus();
+});
+
+// Dengar hasil realtime
+onValue(hasilRef, (snapshot) => {
+  if (hasilTerlihat && snapshot.exists()) tampilkanHasil(snapshot.val());
+});
 
 function vote(kandidat) {
-  if (votingTerkunci) {
-    alert("Voting sudah dikunci.");
-    return;
-  }
+  if (votingTerkunci) return alert("Voting sudah dikunci.");
+  if (sudahVote) return alert("Kamu sudah memilih.");
 
-  if (sudahVote) {
-    alert("Kamu sudah memilih. Gunakan reset dengan kode untuk memilih ulang.");
-    return;
-  }
+  if (!confirm("Yakin memilih kandidat ini?")) return;
 
-  if (!confirm("Apakah kamu yakin memilih kandidat ini?")) return;
-
-  let hasil = JSON.parse(localStorage.getItem("hasil")) || {
-    kandidat1: 0,
-    kandidat2: 0,
-    kandidat3: 0
-  };
-
-  hasil[kandidat]++;
-  localStorage.setItem("hasil", JSON.stringify(hasil));
-  localStorage.setItem("sudahVote", "true");
-  sudahVote = true;
-  document.getElementById("resetKode").value = "";
-  alert("Pilihan berhasil disimpan!");
+  get(hasilRef).then(snapshot => {
+    let hasil = snapshot.val() || {
+      kandidat1: 0,
+      kandidat2: 0,
+      kandidat3: 0
+    };
+    hasil[kandidat]++;
+    set(hasilRef, hasil);
+    localStorage.setItem("sudahVote", "true");
+    sudahVote = true;
+    alert("Pilihan berhasil disimpan!");
+    document.getElementById("resetKode").value = "";
+  });
 }
 
 document.getElementById("resetKode").addEventListener("input", function () {
@@ -45,46 +66,43 @@ document.getElementById("resetKode").addEventListener("input", function () {
 
 function verifikasiToggleVoting() {
   const pass = prompt("Masukkan password:");
-  if (pass === "pilketos") {
-    const yakin = confirm(votingTerkunci ? "Yakin ingin membuka voting?" : "Yakin ingin mengunci voting?");
-    if (yakin) {
-      votingTerkunci = !votingTerkunci;
-      localStorage.setItem("votingTerkunci", votingTerkunci);
-      updateStatus();
-      alert(votingTerkunci ? "Voting dikunci." : "Voting dibuka.");
+  if (pass !== "pilketos") return alert("Password salah!");
+
+  const konfirmasi = confirm(votingTerkunci ? "Buka voting?" : "Kunci voting?");
+  if (konfirmasi) {
+    votingTerkunci = !votingTerkunci;
+    set(statusRef, votingTerkunci);
+    if (!votingTerkunci) {
+      hasilTerlihat = false;
+      document.getElementById("hasil").style.display = "none";
     }
-  } else {
-    alert("Password salah!");
+    updateStatus();
+    alert(votingTerkunci ? "Voting dikunci." : "Voting dibuka.");
   }
 }
 
 function verifikasiToggleHasil() {
   const pass = prompt("Masukkan password:");
-  if (pass !== "pilketos") {
-    alert("Password salah!");
-    return;
-  }
-
-  if (!votingTerkunci) {
-    alert("Voting masih dibuka. Hasil voting hanya bisa dilihat jika voting telah dikunci.");
-    return;
-  }
+  if (pass !== "pilketos") return alert("Password salah!");
+  if (!votingTerkunci) return alert("Voting belum dikunci.");
 
   hasilTerlihat = !hasilTerlihat;
   document.getElementById("hasil").style.display = hasilTerlihat ? "block" : "none";
-  if (hasilTerlihat) tampilkanHasil();
   updateStatus();
+
+  if (hasilTerlihat) {
+    get(hasilRef).then(snapshot => {
+      if (snapshot.exists()) tampilkanHasil(snapshot.val());
+    });
+  }
 }
 
-function tampilkanHasil() {
+function tampilkanHasil(data) {
   const ctx = document.getElementById("grafikHasil").getContext("2d");
-  const data = JSON.parse(localStorage.getItem("hasil")) || {
-    kandidat1: 0,
-    kandidat2: 0,
-    kandidat3: 0
-  };
 
-  new Chart(ctx, {
+  if (chartInstance) chartInstance.destroy();
+
+  chartInstance = new Chart(ctx, {
     type: "bar",
     data: {
       labels: ["Shatria", "Andan", "Raka"],
@@ -104,6 +122,11 @@ function tampilkanHasil() {
       }
     }
   });
+}
+
+function updateStatus() {
+  document.getElementById("toggleVotingBtn").textContent = votingTerkunci ? "Buka Voting" : "Kunci Voting";
+  document.getElementById("toggleHasilBtn").textContent = hasilTerlihat ? "Tutup Hasil Voting" : "Lihat Hasil Voting";
 }
 
 updateStatus();
