@@ -24,10 +24,12 @@ h1 {
   display: flex;
   justify-content: space-around;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .kandidat {
-  width: 28%;
+  flex: 1 1 28%;
   text-align: center;
   padding: 15px;
   border: 2px solid #ccc;
@@ -80,4 +82,4 @@ h1 {
 
 .buttons button:hover {
   background-color: #005ecb;
-}
+  }
