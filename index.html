@@ -1,42 +1,48 @@
-<!DOCTYPE html>  <html lang="id">  
-<head>  
-  <meta charset="UTF-8" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>  
-  <title>Pemilihan Ketua OSIS</title>  
-  <link rel="stylesheet" href="style.css" />  
-</head>  
-<body>  
-  <div class="container">  
-    <h1>Pemilihan Ketua OSIS</h1>  <div class="kandidat-list">  
-  <div class="kandidat" onclick="vote('kandidat1')">  
-    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Kandidat 1" class="kandidat-img"/>  
-    <h2>Kandidat 1</h2>  
-    <p>Shatria Edcha</p>  
-  </div>  
-  <div class="kandidat" onclick="vote('kandidat2')">  
-    <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Kandidat 2" class="kandidat-img"/>  
-    <h2>Kandidat 2</h2>  
-    <p>Andan Wijaya</p>  
-  </div>  
-  <div class="kandidat" onclick="vote('kandidat3')">  
-    <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Kandidat 3" class="kandidat-img"/>  
-    <h2>Kandidat 3</h2>  
-    <p>Raka Dwi</p>  
-  </div>  
-</div>  
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pemilihan Ketua OSIS</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Pemilihan Ketua OSIS</h1>
 
-<div class="reset-box">  
-  <input type="text" id="resetKode" placeholder="Ketik 'snessa' untuk reset pilihan" />  
-</div>  
+    <div class="kandidat-list">
+      <div class="kandidat" onclick="vote('kandidat1')">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Kandidat 1" class="kandidat-img"/>
+        <h2>Kandidat 1</h2>
+        <p>Shatria Edcha</p>
+      </div>
+      <div class="kandidat" onclick="vote('kandidat2')">
+        <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Kandidat 2" class="kandidat-img"/>
+        <h2>Kandidat 2</h2>
+        <p>Andan Wijaya</p>
+      </div>
+      <div class="kandidat" onclick="vote('kandidat3')">
+        <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Kandidat 3" class="kandidat-img"/>
+        <h2>Kandidat 3</h2>
+        <p>Raka Dwi</p>
+      </div>
+    </div>
 
-<div class="buttons">  
-  <button id="toggleVotingBtn" onclick="verifikasiToggleVoting()">Kunci Voting</button>  
-  <button id="toggleHasilBtn" onclick="verifikasiToggleHasil()">Lihat Hasil Voting</button>  
-</div>  
+    <div class="reset-box">
+      <input type="text" id="resetKode" placeholder="Ketik 'snessa' untuk reset pilihan" />
+    </div>
 
-<div id="hasil" style="display: none;">  
-  <canvas id="grafikHasil" width="400" height="300"></canvas>  
-</div>
+    <div class="buttons">
+      <button id="toggleVotingBtn" onclick="verifikasiToggleVoting()">Kunci Voting</button>
+      <button id="toggleHasilBtn" onclick="verifikasiToggleHasil()">Lihat Hasil Voting</button>
+    </div>
 
-  </div>    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>    <script src="script.js"></script>  </body>  
-</html>
+    <div id="hasil" style="display: none;">
+      <canvas id="grafikHasil" width="400" height="300"></canvas>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+</body>
+      </html>
